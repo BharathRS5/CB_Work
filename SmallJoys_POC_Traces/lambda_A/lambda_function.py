@@ -3,7 +3,7 @@ import requests
 
 def lambda_handler(event, context):
     # URL of the API Gateway that triggers Lambda B
-    api_gateway_url = 'https://<api-id-b>.execute-api.<region>.amazonaws.com/prod/triggerLambdaB'
+    api_gateway_url = 'https://zamv2zuy9g.execute-api.us-east-1.amazonaws.com/dev'
 
     # Data that Lambda A will send to Lambda B
     data = {
