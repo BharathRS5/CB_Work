@@ -12,29 +12,47 @@ def lambda_handler(event, context):
     data = {
         'message': 'Hello from Lambda A'
     }
+    
+    # Get the HTTP method (POST or GET) from the event object
+    method = event['requestContext']['http']['method'].lower()  # Use .lower() correctly to ensure it's lowercase
+    
+    post_message = ""
+    get_message = ""
 
     # Make the HTTP POST request to trigger Lambda B via its API Gateway
     try:
-        # Trigger Lambda B via POST
-        response_post = requests.post(api_gateway_url_post, json=data)
-        response_post.raise_for_status()  # This will raise an error for non-2xx responses
-        post_message = 'Lambda A triggered Lambda B successfully'
-        print(post_message)
+        if method == "post":    
+            # Trigger Lambda B via POST
+            response_post = requests.post(api_gateway_url_post, json=data)
+            response_post.raise_for_status()  # This will raise an error for non-2xx responses
+            post_message = 'Lambda A triggered Lambda B successfully'
+            print(post_message)
         
-        # Now, trigger a GET request to another endpoint
-        response_get = requests.get(api_gateway_url_get)
-        response_get.raise_for_status()  # This will raise an error for non-2xx responses
-        get_message = 'Lambda A made a GET request successfully'
-        print(get_message)
+        elif method == "get":
+            # Now, trigger a GET request to another endpoint
+            response_get = requests.get(api_gateway_url_get)
+            response_get.raise_for_status()  # This will raise an error for non-2xx responses
+            get_message = 'Lambda A made a GET request successfully'
+            print(get_message)
+        
+        else:
+            # Return an error if the method is neither POST nor GET
+            return {
+                'statusCode': 400,
+                'body': json.dumps({
+                    'message': f"Method '{method}' not allowed"
+                })
+            }
 
         # Return the success status for both operations
         return {
             'statusCode': 200,
             'body': json.dumps({
-                'message': post_message,
+                'post_message': post_message,
                 'get_message': get_message
             })
         }
+    
     except requests.exceptions.RequestException as e:
         # Handle any error that occurs during the HTTP requests
         error_message = f'Error: {str(e)}'
